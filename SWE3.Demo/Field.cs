@@ -5,6 +5,8 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
+
+
 namespace SWE3.Demo
 {
     /// <summary>This class holds field metadata.</summary>
@@ -57,6 +59,32 @@ namespace SWE3.Demo
 
                 throw new NotSupportedException("Member type not supported.");
             }
+        }
+
+
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // public methods                                                                                                   //
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        
+        /// <summary>Gets the field value.</summary>
+        /// <param name="obj">Object.</param>
+        public object GetValue(object obj)
+        {
+            if(FieldMember is PropertyInfo) { return ((PropertyInfo) FieldMember).GetValue(obj); }
+
+            throw new NotSupportedException("Member type not supported.");
+        }
+
+
+        /// <summary>Sets the field value.</summary>
+        /// <param name="obj">Object.</param>
+        /// <param name="value">Value.</param>
+        public void SetValue(object obj, object value)
+        {
+            if(FieldMember is PropertyInfo) { ((PropertyInfo) FieldMember).SetValue(obj, value); return; }
+
+            throw new NotSupportedException("Member type not supported.");
         }
     }
 }

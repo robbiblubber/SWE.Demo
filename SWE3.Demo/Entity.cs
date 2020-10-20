@@ -18,13 +18,19 @@ namespace SWE3.Demo
         /// <param name="t">Type.</param>
         public Entity(Type t)
         {
-            TableName = t.Name;
+            tabAttribute tattr = (tabAttribute) t.GetCustomAttribute(typeof(tabAttribute));
+            if((tattr == null) || (string.IsNullOrWhiteSpace(tattr.TableName)))
+            {
+                TableName = t.Name;
+            }
+            else { TableName = tattr.TableName; }
+
             EntityType = t;
             List<Field> fields = new List<Field>();
 
             foreach(PropertyInfo i in t.GetProperties())
             {
-                Field field = new Field();
+                Field field = new Field(this);
 
                 fieldAttribute fattr = (fieldAttribute) i.GetCustomAttribute(typeof(fieldAttribute));
 
