@@ -13,5 +13,9 @@ namespace SWE3.Demo
         
         /// <summary>Database column name.</summary>
         public string ColumnName = null;
+
+
+        /// <summary>Database column type.</summary>
+        public Type ColumnType = null;
     }
 }

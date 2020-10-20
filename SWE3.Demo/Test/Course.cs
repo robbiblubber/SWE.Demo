@@ -20,8 +20,8 @@ namespace SWE3.Demo.Test
 
 
         /// <summary>Gets or sets the active flag.</summary>
-        [field(ColumnName = "HACTIVE")]
-        public int Active { get; set; }
+        [field(ColumnName = "HACTIVE", ColumnType = typeof(int))]
+        public bool Active { get; set; }
 
 
         /// <summary>Course name.</summary>

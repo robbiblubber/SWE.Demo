@@ -27,6 +27,7 @@ namespace SWE3.Demo
 
             EntityType = t;
             List<Field> fields = new List<Field>();
+            List<Field> pks = new List<Field>();
 
             foreach(PropertyInfo i in t.GetProperties())
             {
@@ -34,18 +35,25 @@ namespace SWE3.Demo
 
                 fieldAttribute fattr = (fieldAttribute) i.GetCustomAttribute(typeof(fieldAttribute));
 
-                if((fattr != null) && (fattr.ColumnName != null))
+                if(fattr != null)
                 {
-                    field.ColumnName = fattr.ColumnName;
+                    if(fattr is pkAttribute) { pks.Add(field); }
+
+                    field.ColumnName = (fattr?.ColumnName ?? i.Name);
+                    field.ColumnType = (fattr?.ColumnType ?? i.PropertyType);
                 }
-                else { field.ColumnName = i.Name; }
-                
+                else 
+                {                     
+                    field.ColumnName = i.Name;
+                    field.ColumnType = i.PropertyType;
+                }                
                 field.FieldMember = i;
 
                 fields.Add(field);
             }
 
             Fields = fields.ToArray();
+            PrimaryKeys = pks.ToArray();
         }
 
 
@@ -57,16 +65,7 @@ namespace SWE3.Demo
         /// <summary>Gets the primary keys.</summary>
         public Field[] PrimaryKeys
         {
-            get
-            {
-                List<Field> rval = new List<Field>();
-                foreach(Field i in Fields)
-                {
-                    if(i.FieldMember.GetCustomAttribute(typeof(pkAttribute)) != null) { rval.Add(i); }
-                }
-
-                return rval.ToArray();
-            }
+            get; internal set;
         }
 
 

@@ -62,7 +62,7 @@ namespace SWE3.Demo
 
             foreach(Field i in rval._GetEntity().Fields)
             {
-                i.SetValue(rval, re.GetValue(re.GetOrdinal(i.ColumnName)));
+                i.SetValue(rval, i.ToFieldType(re.GetValue(re.GetOrdinal(i.ColumnName))));
             }
             return rval;
         }
