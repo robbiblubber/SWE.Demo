@@ -21,7 +21,7 @@ namespace SWE3.Demo.Show
         /// <summary>Implements the demonstration.</summary>
         public static void Show()
         {
-            Entity ent = typeof(Course)._GetEntity();
+            Entity ent = typeof(Teacher)._GetEntity();
 
             foreach(Field i in ent.Fields)
             {

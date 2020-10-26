@@ -18,7 +18,7 @@ namespace SWE3.Demo
         /// <param name="t">Type.</param>
         public Entity(Type t)
         {
-            tabAttribute tattr = (tabAttribute) t.GetCustomAttribute(typeof(tabAttribute));
+            entityAttribute tattr = (entityAttribute) t.GetCustomAttribute(typeof(entityAttribute));
             if((tattr == null) || (string.IsNullOrWhiteSpace(tattr.TableName)))
             {
                 TableName = t.Name;

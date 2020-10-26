@@ -24,7 +24,7 @@ namespace SWE3.Demo.Show
             World.Connection = new SQLiteConnection("Data Source=test.sqlite;Version=3;");
             World.Connection.Open();
 
-            foreach(Course i in World.FromSQL<Course>("SELECT * FROM COURSES WHERE ID != 1"))
+            foreach(Teacher i in World.FromSQL<Teacher>("SELECT * FROM TEACHERS WHERE ID != 'T1'"))
             {
                 Console.WriteLine(i.ID + ": [" + i.Name + "]");
             }

@@ -11,7 +11,7 @@ namespace SWE3.Demo
 {
     /// <summary>This attribute marks a class as an entity.</summary>
     [AttributeUsage(AttributeTargets.Class)]
-    public class tabAttribute: Attribute
+    public class entityAttribute: Attribute
     {
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // public members                                                                                                   //

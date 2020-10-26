@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace SWE3.Demo.Test
 {
     /// <summary>This class represents a course in the school model.</summary>
-    [tab(TableName = "COURSES")]
+    [entity(TableName = "COURSES")]
     public class Course
     {
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

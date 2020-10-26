@@ -97,14 +97,18 @@ namespace SWE3.Demo
         /// <returns>Field type representation of the value.</returns>
         public object ToFieldType(object value)
         {
-            if(FieldType == ColumnType) { return value; }
-
             if(FieldType == typeof(bool))
             {
                 if(value is int)   { return ((int)   value != 0); }
                 if(value is short) { return ((short) value != 0); }
                 if(value is long)  { return ((long)  value != 0); }
             }
+
+            if(FieldType == typeof(short)) { return Convert.ToInt16(value); }
+            if(FieldType == typeof(int))   { return Convert.ToInt32(value); }
+            if(FieldType == typeof(long))  { return Convert.ToInt64(value); }
+
+            if(FieldType.IsEnum) { return Enum.ToObject(FieldType, value); }
 
             return value;
         }

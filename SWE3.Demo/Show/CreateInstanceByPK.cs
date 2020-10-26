@@ -20,8 +20,8 @@ namespace SWE3.Demo.Show
             World.Connection = new SQLiteConnection("Data Source=test.sqlite;Version=3;");
             World.Connection.Open();
 
-            Course c = World.GetObject<Course>("1");
-            Console.WriteLine(c.ID + " => " + c.Name);
+            Teacher t = World.GetObject<Teacher>("T0");
+            Console.WriteLine(t.ID + " => " + t.Name);
             
             Console.ReadLine();
         }

@@ -68,11 +68,25 @@ namespace SWE3.Demo
         }
 
 
+        /// <summary>Fills a list </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="list">List.</param>
+        /// <param name="cmd">Command.</param>
+        internal static void _FillList<T>(IList<T> list, IDataReader re)
+        {
+            while(re.Read())
+            {
+                list.Add(_CreateObject<T>(re));
+            }
+            re.Close();
+        }
+
+
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // public static methods                                                                                            //
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        
+
         /// <summary>Returns an array of instances for an SQL query.</summary>
         /// <typeparam name="T">Type.</typeparam>
         /// <param name="sql">SQL query.</param>
@@ -84,12 +98,7 @@ namespace SWE3.Demo
             IDataReader re = cmd.ExecuteReader();
             
             List<T> rval = new List<T>();
-            while(re.Read())
-            {
-                rval.Add(_CreateObject<T>(re));
-            }
-            re.Close();
-            cmd.Dispose();
+            _FillList<T>(rval, re);
 
             return rval.ToArray();
         }
@@ -116,7 +125,7 @@ namespace SWE3.Demo
             for(int i = 0; i < ent.PrimaryKeys.Length; i++)
             {
                 if(i > 0) { query += " AND "; }
-                query += (":pkv_" + i.ToString());
+                query += (ent.PrimaryKeys[i].ColumnName + " = " + (":pkv_" + i.ToString()));
 
                 IDataParameter p = cmd.CreateParameter();
                 p.ParameterName = (":pkv_" + i.ToString());

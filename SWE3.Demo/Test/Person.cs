@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace SWE3.Demo.Test
 {
     /// <summary>This is a person implementation (from School example).</summary>
-    public class Person
+    public abstract class Person
     {
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // public properties                                                                                                //
@@ -17,18 +17,28 @@ namespace SWE3.Demo.Test
         [pk]
         public string ID { get; set; }
 
-        /// <summary>Gets or sets the person name.</summary>
+
+        /// <summary>Gets or sets the person's name.</summary>
         public string Name { get; set; }
 
+
+        /// <summary>Gets or sets the person's first name.</summary>
+        public string FirstName { get; set; }
+
+
+        /// <summary>Gets or sets the person's birth date.</summary>
+        [field(ColumnName = "BDATE")]
+        public DateTime BirthDate { get; set; }
+
+
         /// <summary>Gets or sets the person gender.</summary>
-        [field(ColumnName = "IS_MALE")]
         public Gender Gender { get; set; }
     }
 
 
 
     /// <summary>This enumeration defiones genders.</summary>
-    public enum Gender
+    public enum Gender: int
     {
         FEMALE = 0,
         MALE = 1
