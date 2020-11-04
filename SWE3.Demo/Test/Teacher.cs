@@ -10,7 +10,7 @@ namespace SWE3.Demo.Test
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // public properties                                                                                                //
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        
+
         /// <summary>Gets or sets the teacher's salary.</summary>
         public int Salary { get; set; }
 
@@ -23,5 +23,10 @@ namespace SWE3.Demo.Test
         /// <summary>Gets the teacher's classes.</summary>
         [fk(ColumnName = "KTEACHER")]
         public List<Class> Classes { get; private set; }
+
+
+        /// <summary>Gets the teacher's courses.</summary>
+        [fk(ColumnName = "KTEACHER")]
+        public LazyList<Course> Courses { get; private set; }
     }
 }

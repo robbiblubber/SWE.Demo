@@ -5,11 +5,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+
+
 namespace SWE3.Demo
 {
     /// <summary>This class implements a lazy loading wrapper for framework object lists.</summary>
     /// <typeparam name="T">Type.</typeparam>
-    public class LazyList<T>: IList<T>
+    public class LazyList<T>: IList<T>, ILazy
     {
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // protected members                                                                                                //

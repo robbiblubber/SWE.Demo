@@ -23,7 +23,7 @@ namespace SWE3.Demo.Show
             Class c = World.GetObject<Class>("C1");
 
             Console.Write(c.ID + " => " + c.Name);
-            Console.WriteLine("(Teacher: " + c.Teacher.Name + ")");
+            Console.WriteLine(" (Teacher: " + c.Teacher.Name + ")");
 
             Console.ReadLine();
         }

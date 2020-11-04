@@ -32,7 +32,7 @@ namespace SWE3.Demo
             List<Field> fields = new List<Field>();
             List<Field> pks = new List<Field>();
 
-            foreach(PropertyInfo i in t.GetProperties())
+            foreach(PropertyInfo i in t.GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
             {
                 if((ignoreAttribute) i.GetCustomAttribute(typeof(ignoreAttribute)) != null) continue;
 
@@ -52,8 +52,10 @@ namespace SWE3.Demo
                         field.IsExternal = typeof(IEnumerable).IsAssignableFrom(i.PropertyType);
                     }
                 }
-                else 
-                {                     
+                else
+                {
+                    if((i.GetGetMethod() == null) || (!i.GetGetMethod().IsPublic)) continue;
+
                     field.ColumnName = i.Name;
                     field.ColumnType = i.PropertyType;
                 }                

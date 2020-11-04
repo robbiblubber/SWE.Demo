@@ -152,7 +152,7 @@ namespace SWE3.Demo
                     if(IsExternal)
                     {
                         Type innerType = FieldType.GetGenericArguments()[0];
-                        object rval = (IList) Activator.CreateInstance(FieldType);
+                        object rval = Activator.CreateInstance(FieldType);
 
                         World._FillList(innerType, rval, innerType._GetEntity().GetSQL() + " WHERE " + ColumnName + " = :fk", 
                                         new Tuple<string, object>(":fk", Entity.PrimaryKeys[0].ToFieldType(value)));
@@ -161,12 +161,15 @@ namespace SWE3.Demo
                     }
                     else
                     {
-                        if(FieldType.Name == "Lazy`1")
+                        if(typeof(ILazy).IsAssignableFrom(FieldType))
                         {
                             Type innerType = FieldType.GetGenericArguments()[0];
                             ((PropertyInfo) FieldMember).SetValue(obj, Activator.CreateInstance(FieldType, innerType._GetEntity().PrimaryKeys[0].ToFieldType(value)));
                         }
-                        else ((PropertyInfo) FieldMember).SetValue(obj, World.GetObject(FieldType._GetEntity().EntityType, FieldType._GetEntity().PrimaryKeys[0].ToFieldType(value)));
+                        else
+                        {
+                            ((PropertyInfo) FieldMember).SetValue(obj, World.GetObject(FieldType._GetEntity().EntityType, FieldType._GetEntity().PrimaryKeys[0].ToFieldType(value)));
+                        }
                     } 
                 }
                 else { ((PropertyInfo) FieldMember).SetValue(obj, value); }

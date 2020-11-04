@@ -55,6 +55,7 @@
     <Compile Include="Attributes\fieldAttribute.cs" />
     <Compile Include="Attributes\pkAttribute.cs" />
     <Compile Include="Attributes\entityAttribute.cs" />
+    <Compile Include="ILazy.cs" />
     <Compile Include="LazyListT.cs" />
     <Compile Include="LazyT.cs" />
     <Compile Include="Show\CreateObjectWithFKList.cs" />

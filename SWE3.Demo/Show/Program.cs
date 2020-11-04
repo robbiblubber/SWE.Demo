@@ -20,8 +20,8 @@ namespace SWE3.Demo.Show
             SQLToFrameworkObjects.Show();
             CreateObjectWithFK.Show();
             */
-
-            CreateObjectWithFKList.Show();
+            CreateObjectWithFK.Show();
+            //CreateObjectWithFKList.Show();
         }
     }
 }

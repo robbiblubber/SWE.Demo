@@ -6,7 +6,7 @@ namespace SWE3.Demo
 {
     /// <summary>This class implements a lazy loading wrapper for framework objects.</summary>
     /// <typeparam name="T">Type.</typeparam>
-    public class Lazy<T>
+    public class Lazy<T>: ILazy
     {
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // protected members                                                                                                //

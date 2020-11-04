@@ -23,9 +23,10 @@ namespace SWE3.Demo.Test
 
         /// <summary>Gets or sets the class teacher.</summary>
         [fk(ColumnName = "KTEACHER")]
-        public Lazy<Teacher> _backTeacher { get; set; }
+        private Lazy<Teacher> _backTeacher { get; set; }
 
 
+        /// <summary>Gets or sets the class teacher.</summary>
         [ignore]
         public Teacher Teacher
         {
