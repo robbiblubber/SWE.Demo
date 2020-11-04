@@ -5,7 +5,7 @@
 namespace SWE3.Demo.Test
 {
     /// <summary>This class represents a class in the school model.</summary>
-    [entity(TableName = "COURSES")]
+    [entity(TableName = "CLASSES")]
     public class Class
     {
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -19,5 +19,18 @@ namespace SWE3.Demo.Test
 
         /// <summary>Gets or sets the class name.</summary>
         public string Name { get; set; }
+
+
+        /// <summary>Gets or sets the class teacher.</summary>
+        [fk(ColumnName = "KTEACHER")]
+        public Lazy<Teacher> _backTeacher { get; set; }
+
+
+        [ignore]
+        public Teacher Teacher
+        {
+            get { return _backTeacher.Value; }
+            set { _backTeacher.Value = value; }
+        }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -58,12 +59,28 @@ namespace SWE3.Demo
         /// <returns>Object.</returns>
         internal static T _CreateObject<T>(IDataReader re)
         {
-            T rval = (T) Activator.CreateInstance(typeof(T));
+            return (T) _CreateObject(typeof(T), re);
+        }
 
-            foreach(Field i in rval._GetEntity().Fields)
+
+        /// <summary>Creates an object from a database reader.</summary>
+        /// <typeparam name="T">Type.</typeparam>
+        /// <param name="re">Reader.</param>
+        /// <returns>Object.</returns>
+        internal static object _CreateObject(Type t, IDataReader re)
+        {
+            object rval = Activator.CreateInstance(t);
+
+            foreach(Field i in rval._GetEntity().Internals)
             {
-                i.SetValue(rval, i.ToFieldType(re.GetValue(re.GetOrdinal(i.ColumnName))));
+                i.SetValue(rval, i.ToFieldType(re.GetValue(re.GetOrdinal(i.IsExternal ? i.Entity.PrimaryKeys[0].ColumnName : i.ColumnName))));
             }
+
+            foreach(Field i in rval._GetEntity().Externals)
+            {
+                i.SetValue(rval, i.ToFieldType(re.GetValue(re.GetOrdinal(i.IsExternal ? i.Entity.PrimaryKeys[0].ColumnName : i.ColumnName))));
+            }
+
             return rval;
         }
 
@@ -71,14 +88,49 @@ namespace SWE3.Demo
         /// <summary>Fills a list </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="list">List.</param>
-        /// <param name="cmd">Command.</param>
-        internal static void _FillList<T>(IList<T> list, IDataReader re)
+        /// <param name="re">Reader.</param>
+        internal static void _FillList<T>(ICollection<T> list, IDataReader re)
+        {
+            _FillList(typeof(T), list, re);
+        }
+
+
+        /// <summary>Fills a list.</summary>
+        /// <param name="t">Type.</param>
+        /// <param name="list">List.</param>
+        /// <param name="re">Reader.</param>
+        internal static void _FillList(Type t, object list, IDataReader re)
         {
             while(re.Read())
             {
-                list.Add(_CreateObject<T>(re));
+                list.GetType().GetMethod("Add").Invoke(list, new object[] { _CreateObject(t, re) });
             }
+        }
+
+
+        /// <summary>Fills a list.</summary>
+        /// <param name="t">Type.</param>
+        /// <param name="list">List.</param>
+        /// <param name="sql">SQL query.</param>
+        /// <param name="parameters">Parameters.</param>
+        internal static void _FillList(Type t, object list, string sql, params Tuple<string, object>[] parameters)
+        {
+            IDbCommand cmd = Connection.CreateCommand();
+            cmd.CommandText = sql;
+
+            foreach(Tuple<string, object> i in parameters)
+            {
+                IDataParameter p = cmd.CreateParameter();
+                p.ParameterName = i.Item1;
+                p.Value = i.Item2;
+                cmd.Parameters.Add(p);
+            }
+
+            IDataReader re = cmd.ExecuteReader();
+            _FillList(t, list, re);
             re.Close();
+            re.Dispose();
+            cmd.Dispose();
         }
 
 
@@ -99,6 +151,9 @@ namespace SWE3.Demo
             
             List<T> rval = new List<T>();
             _FillList<T>(rval, re);
+            re.Close();
+            re.Dispose();
+            cmd.Dispose();
 
             return rval.ToArray();
         }
@@ -110,17 +165,21 @@ namespace SWE3.Demo
         /// <returns>Object.</returns>
         public static T GetObject<T>(params object[] pks)
         {
-            Entity ent = typeof(T)._GetEntity();
+            return (T) GetObject(typeof(T), pks);
+        }
+
+
+        /// <summary>Creates an instance by its primary keys.</summary>
+        /// <param name="t">Type.</param>
+        /// <param name="pks">Primary keys.</param>
+        /// <returns>Object.</returns>
+        public static object GetObject(Type t, params object[] pks)
+        {
+            Entity ent = t._GetEntity();
 
             IDbCommand cmd = Connection.CreateCommand();
 
-            string query = "SELECT ";
-            for(int i = 0; i < ent.Fields.Length; i++) 
-            {
-                if(i > 0) { query += ","; }
-                query += ent.Fields[i].ColumnName;
-            }
-            query += (" FROM " + ent.TableName + " WHERE ");
+            string query = ent.GetSQL() + " WHERE ";
 
             for(int i = 0; i < ent.PrimaryKeys.Length; i++)
             {
@@ -134,11 +193,11 @@ namespace SWE3.Demo
             }
             cmd.CommandText = query;
 
-            T rval;
+            object rval;
             IDataReader re = cmd.ExecuteReader();
             if(re.Read())
             {
-                rval = _CreateObject<T>(re);
+                rval = _CreateObject(t, re);
             }
             else { throw new Exception("No data."); }
 

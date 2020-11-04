@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -57,7 +59,14 @@ namespace SWE3.Demo
         }
 
 
-        /// <summary>Gets the field type</summary>
+        /// <summary>Gets if the column is a foreign key.</summary>
+        public bool IsForeignKey
+        {
+            get; internal set;
+        }
+
+
+        /// <summary>Gets the field type.</summary>
         public Type FieldType
         {
             get 
@@ -66,6 +75,13 @@ namespace SWE3.Demo
 
                 throw new NotSupportedException("Member type not supported.");
             }
+        }
+
+
+        /// <summary>Gets if the field is not part of the table.</summary>
+        public bool IsExternal
+        {
+            get; set;
         }
 
 
@@ -129,7 +145,34 @@ namespace SWE3.Demo
         /// <param name="value">Value.</param>
         public void SetValue(object obj, object value)
         {
-            if(FieldMember is PropertyInfo) { ((PropertyInfo) FieldMember).SetValue(obj, value); return; }
+            if(FieldMember is PropertyInfo) 
+            {
+                if(IsForeignKey)
+                {
+                    if(IsExternal)
+                    {
+                        Type innerType = FieldType.GetGenericArguments()[0];
+                        object rval = (IList) Activator.CreateInstance(FieldType);
+
+                        World._FillList(innerType, rval, innerType._GetEntity().GetSQL() + " WHERE " + ColumnName + " = :fk", 
+                                        new Tuple<string, object>(":fk", innerType._GetEntity().PrimaryKeys[0].ToFieldType(Entity.PrimaryKeys[0].GetValue(obj))));
+
+                        ((PropertyInfo) FieldMember).SetValue(obj, rval);
+                    }
+                    else
+                    {
+                        if(FieldType.Name == "Lazy`1")
+                        {
+                            Type innerType = FieldType.GetGenericArguments()[0];
+                            ((PropertyInfo) FieldMember).SetValue(obj, Activator.CreateInstance(FieldType, innerType._GetEntity().PrimaryKeys[0].ToFieldType(value)));
+                        }
+                        else ((PropertyInfo) FieldMember).SetValue(obj, World.GetObject(FieldType._GetEntity().EntityType, FieldType._GetEntity().PrimaryKeys[0].ToFieldType(value)));
+                    } 
+                }
+                else { ((PropertyInfo) FieldMember).SetValue(obj, value); }
+
+                return;
+            }
 
             throw new NotSupportedException("Member type not supported.");
         }

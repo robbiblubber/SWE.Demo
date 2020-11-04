@@ -15,9 +15,13 @@ namespace SWE3.Demo.Show
         /// <param name="args">Arguments</param>
         static void Main(string[] args)
         {
-            FieldsFromEntity.Show();
+            /*FieldsFromEntity.Show();
             CreateInstanceByPK.Show();
             SQLToFrameworkObjects.Show();
+            CreateObjectWithFK.Show();
+            */
+
+            CreateObjectWithFKList.Show();
         }
     }
 }

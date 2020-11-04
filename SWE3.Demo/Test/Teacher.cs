@@ -1,6 +1,5 @@
 ﻿using System;
-
-
+using System.Collections.Generic;
 
 namespace SWE3.Demo.Test
 {
@@ -19,5 +18,10 @@ namespace SWE3.Demo.Test
         [field(ColumnName = "HDATE")]
         /// <summary>Gets or sets the teacher's hire date.</summary>
         public DateTime HireDate { get; set; }
+
+
+        /// <summary>Gets the teacher's classes.</summary>
+        [fk(ColumnName = "KTEACHER")]
+        public List<Class> Classes { get; private set; }
     }
 }

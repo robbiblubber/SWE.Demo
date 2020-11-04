@@ -1,9 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Reflection;
+using System.Collections;
+using System.Collections.Generic;
+
+
 
 namespace SWE3.Demo
 {
@@ -31,6 +34,8 @@ namespace SWE3.Demo
 
             foreach(PropertyInfo i in t.GetProperties())
             {
+                if((ignoreAttribute) i.GetCustomAttribute(typeof(ignoreAttribute)) != null) continue;
+
                 Field field = new Field(this);
 
                 fieldAttribute fattr = (fieldAttribute) i.GetCustomAttribute(typeof(fieldAttribute));
@@ -41,6 +46,11 @@ namespace SWE3.Demo
 
                     field.ColumnName = (fattr?.ColumnName ?? i.Name);
                     field.ColumnType = (fattr?.ColumnType ?? i.PropertyType);
+                    
+                    if(field.IsForeignKey = (fattr is fkAttribute))
+                    {
+                        field.IsExternal = typeof(IEnumerable).IsAssignableFrom(i.PropertyType);
+                    }
                 }
                 else 
                 {                     
@@ -53,6 +63,9 @@ namespace SWE3.Demo
             }
 
             Fields = fields.ToArray();
+            Externals = fields.Where(m => m.IsExternal).ToArray();
+            Internals = fields.Where(m => (!m.IsExternal)).ToArray();
+
             PrimaryKeys = pks.ToArray();
         }
 
@@ -87,6 +100,42 @@ namespace SWE3.Demo
         public Field[] Fields
         {
             get; private set;
+        }
+
+
+        /// <summary>Gets external fields.</summary>
+        /// <remarks>External fields are referenced fields that do not belong to the underlying table.</remarks>
+        public Field[] Externals
+        {
+            get; set;
+        }
+
+
+        /// <summary>Gets internal fields.</summary>
+        public Field[] Internals
+        {
+            get; set;
+        }
+
+
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // public methods                                                                                                   //
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        
+        /// <summary>Gets entity SQL.</summary>
+        /// <returns>SQL string.</returns>
+        public string GetSQL()
+        {
+            string query = "SELECT ";
+            for(int i = 0; i < Internals.Length; i++)
+            {
+                if(i > 0) { query += ","; }
+                query += Internals[i].ColumnName;
+            }
+            query += (" FROM " + TableName);
+
+            return query;
         }
     }
 }
