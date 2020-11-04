@@ -71,12 +71,7 @@ namespace SWE3.Demo
         {
             object rval = Activator.CreateInstance(t);
 
-            foreach(Field i in rval._GetEntity().Internals)
-            {
-                i.SetValue(rval, i.ToFieldType(re.GetValue(re.GetOrdinal(i.IsExternal ? i.Entity.PrimaryKeys[0].ColumnName : i.ColumnName))));
-            }
-
-            foreach(Field i in rval._GetEntity().Externals)
+            foreach(Field i in rval._GetEntity().Fields)
             {
                 i.SetValue(rval, i.ToFieldType(re.GetValue(re.GetOrdinal(i.IsExternal ? i.Entity.PrimaryKeys[0].ColumnName : i.ColumnName))));
             }
