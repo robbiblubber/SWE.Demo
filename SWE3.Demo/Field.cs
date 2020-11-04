@@ -155,7 +155,7 @@ namespace SWE3.Demo
                         object rval = (IList) Activator.CreateInstance(FieldType);
 
                         World._FillList(innerType, rval, innerType._GetEntity().GetSQL() + " WHERE " + ColumnName + " = :fk", 
-                                        new Tuple<string, object>(":fk", innerType._GetEntity().PrimaryKeys[0].ToFieldType(Entity.PrimaryKeys[0].GetValue(obj))));
+                                        new Tuple<string, object>(":fk", Entity.PrimaryKeys[0].ToFieldType(value)));
 
                         ((PropertyInfo) FieldMember).SetValue(obj, rval);
                     }
