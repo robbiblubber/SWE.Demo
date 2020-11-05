@@ -27,8 +27,11 @@ namespace SWE3.Demo.Show
             {
                 Console.WriteLine("   " + i.Name + " (class)");
             }
-
-
+            
+            foreach(Course i in t.Courses)
+            {
+                Console.WriteLine("   " + i.Name + " (course)");
+            }
             Console.ReadLine();
         }
     }

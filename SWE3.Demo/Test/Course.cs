@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
+
 
 namespace SWE3.Demo.Test
 {
@@ -26,5 +24,10 @@ namespace SWE3.Demo.Test
 
         /// <summary>Gets or sets the course name.</summary>
         public string Name { get; set; }
+
+
+        /// <summary>Gets or sets the course teacher.</summary>
+        [fk(ColumnName = "KTEACHER")]
+        public Teacher Teacher { get; set; }
     }
 }

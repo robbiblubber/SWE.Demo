@@ -42,7 +42,11 @@ namespace SWE3.Demo
 
                 if(fattr != null)
                 {
-                    if(fattr is pkAttribute) { pks.Add(field); }
+                    if(fattr is pkAttribute) 
+                    { 
+                        pks.Add(field);
+                        field.IsPrimaryKey = true;
+                    }
 
                     field.ColumnName = (fattr?.ColumnName ?? i.Name);
                     field.ColumnType = (fattr?.ColumnType ?? i.PropertyType);

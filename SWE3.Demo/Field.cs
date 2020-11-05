@@ -60,10 +60,17 @@ namespace SWE3.Demo
 
 
         /// <summary>Gets if the column is a foreign key.</summary>
+        public bool IsPrimaryKey
+        {
+            get; internal set;
+        } = false;
+
+
+        /// <summary>Gets if the column is a foreign key.</summary>
         public bool IsForeignKey
         {
             get; internal set;
-        }
+        } = false;
 
 
         /// <summary>Gets the field type.</summary>
@@ -143,7 +150,8 @@ namespace SWE3.Demo
         /// <summary>Sets the field value.</summary>
         /// <param name="obj">Object.</param>
         /// <param name="value">Value.</param>
-        public void SetValue(object obj, object value)
+        /// <param name="objects">Cached objects.</param>
+        public void SetValue(object obj, object value, ICollection<object> objects = null)
         {
             if(FieldMember is PropertyInfo) 
             {
@@ -155,7 +163,7 @@ namespace SWE3.Demo
                         object rval = Activator.CreateInstance(FieldType);
 
                         World._FillList(innerType, rval, innerType._GetEntity().GetSQL() + " WHERE " + ColumnName + " = :fk", 
-                                        new Tuple<string, object>(":fk", Entity.PrimaryKeys[0].ToFieldType(value)));
+                                        new Tuple<string, object>[] { new Tuple<string, object>(":fk", Entity.PrimaryKeys[0].ToFieldType(value)) }, objects);
 
                         ((PropertyInfo) FieldMember).SetValue(obj, rval);
                     }
@@ -168,7 +176,8 @@ namespace SWE3.Demo
                         }
                         else
                         {
-                            ((PropertyInfo) FieldMember).SetValue(obj, World.GetObject(FieldType._GetEntity().EntityType, FieldType._GetEntity().PrimaryKeys[0].ToFieldType(value)));
+                            ((PropertyInfo) FieldMember).SetValue(obj, World._CreateObject(FieldType._GetEntity().EntityType,
+                                                                  new object[] { FieldType._GetEntity().PrimaryKeys[0].ToFieldType(value) }, objects));
                         }
                     } 
                 }
