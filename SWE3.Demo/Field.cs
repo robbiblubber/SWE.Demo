@@ -160,11 +160,19 @@ namespace SWE3.Demo
                     if(IsExternal)
                     {
                         Type innerType = FieldType.GetGenericArguments()[0];
-                        object rval = Activator.CreateInstance(FieldType);
+                        string sql = innerType._GetEntity().GetSQL() + " WHERE " + ColumnName + " = :fk";
+                        Tuple<string, object>[] parameters = new Tuple<string, object>[] { new Tuple<string, object>(":fk", Entity.PrimaryKeys[0].ToFieldType(value)) };
+                        object rval;
 
-                        World._FillList(innerType, rval, innerType._GetEntity().GetSQL() + " WHERE " + ColumnName + " = :fk", 
-                                        new Tuple<string, object>[] { new Tuple<string, object>(":fk", Entity.PrimaryKeys[0].ToFieldType(value)) }, objects);
-
+                        if(typeof(ILazy).IsAssignableFrom(FieldType))
+                        {
+                            rval = Activator.CreateInstance(FieldType, sql, parameters);
+                        }
+                        else
+                        {
+                            rval = Activator.CreateInstance(FieldType);
+                            World._FillList(innerType, rval, sql, parameters, objects);
+                        }
                         ((PropertyInfo) FieldMember).SetValue(obj, rval);
                     }
                     else

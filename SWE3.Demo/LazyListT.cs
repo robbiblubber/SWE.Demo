@@ -20,20 +20,39 @@ namespace SWE3.Demo
         /// <summary>Primary keys.</summary>
         protected object[] _Pks;
 
-
         /// <summary>List values.</summary>
         protected List<T> _InternalItems = null;
 
-
         /// <summary>Table implementing a many to many relationship.</summary>
         protected string _Table = null;
+
+        /// <summary>SQL.</summary>
+        protected string _Sql;
+
+        /// <summary>SQL parameters.</summary>
+        protected ICollection<Tuple<string, object>> _Params;
+
+
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // constructors                                                                                                     //
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        
+        /// <summary>Creates a new instance of this class.</summary>
+        /// <param name="sql">SQL.</param>
+        /// <param name="parameters">SQL parameters.</param>
+        public LazyList(string sql, ICollection<Tuple<string, object>> parameters)
+        {
+            _Sql = sql;
+            _Params = parameters;
+        }
 
 
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // protected properties                                                                                             //
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        
+
         /// <summary>Gets the list values.</summary>
         protected List<T> _Items
         {
@@ -41,7 +60,8 @@ namespace SWE3.Demo
             {
                 if(_InternalItems == null)
                 {
-                    // TODO: implement!
+                    _InternalItems = new List<T>();
+                    World._FillList(typeof(T), _InternalItems, _Sql, _Params);
                 }
                 
                 return _InternalItems;

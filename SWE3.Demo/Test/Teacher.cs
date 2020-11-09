@@ -27,7 +27,7 @@ namespace SWE3.Demo.Test
         
         /// <summary>Gets the teacher's courses.</summary>
         [fk(ColumnName = "KTEACHER")]
-        public List<Course> Courses { get; private set; }
+        public LazyList<Course> Courses { get; private set; }
         
     }
 }
