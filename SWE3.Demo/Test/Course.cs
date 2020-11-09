@@ -1,6 +1,5 @@
 ﻿using System;
-
-
+using System.Collections.Generic;
 
 namespace SWE3.Demo.Test
 {
@@ -29,5 +28,10 @@ namespace SWE3.Demo.Test
         /// <summary>Gets or sets the course teacher.</summary>
         [fk(ColumnName = "KTEACHER")]
         public Teacher Teacher { get; set; }
+
+
+        /// <summary>Gets or sets the students in this course.</summary>
+        [fk(AssignmentTable = "STUDENT_COURSES", ColumnName = "KCOURSE", RemoteColumnName = "KSTUDENT")]
+        public List<Student> Students { get; set; }
     }
 }

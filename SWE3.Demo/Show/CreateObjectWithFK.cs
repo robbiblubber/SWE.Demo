@@ -7,7 +7,7 @@ using SWE3.Demo.Test;
 
 namespace SWE3.Demo.Show
 {
-    /// <summary>This class shows how to create a single instance with an ID.</summary>
+    /// <summary>This class shows how to create an instance of an object with a foreign key.</summary>
     public static class CreateObjectWithFK
     {
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

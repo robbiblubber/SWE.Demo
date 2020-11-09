@@ -1,5 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data.SQLite;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 using SWE3.Demo.Test;
 
@@ -7,8 +11,8 @@ using SWE3.Demo.Test;
 
 namespace SWE3.Demo.Show
 {
-    /// <summary>This class shows how to create an instance with lists from foreign keys.</summary>
-    public static class CreateObjectWithFKList
+    /// <summary>This class shows how to create a single instance with an ID.</summary>
+    public class CreateObjectWithMToNFK
     {
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // public static methods                                                                                            //
@@ -20,18 +24,23 @@ namespace SWE3.Demo.Show
             World.Connection = new SQLiteConnection("Data Source=test.sqlite;Version=3;");
             World.Connection.Open();
 
-            Teacher t = World.GetObject<Teacher>("T0");
+            Course c = World.GetObject<Course>("X0");
 
-            Console.WriteLine(t.ID + " => " + t.Name);
-            foreach(Class i in t.Classes)                                       // with eager loading
+            Console.WriteLine(c.ID + " => " + c.Name);
+            foreach(Student i in c.Students)                                    // eager loading
             {
-                Console.WriteLine("   " + i.Name + " (class)");
+                Console.WriteLine("   " + i.Name + " (student)");
             }
-            
-            foreach(Course i in t.Courses)                                      // with lazy loading
+
+            Console.WriteLine();
+            Student s = World.GetObject<Student>("Z2");
+
+            Console.WriteLine(s.ID + " => " + s.Name);
+            foreach(Course i in s.Courses)                                     // lazy loading
             {
                 Console.WriteLine("   " + i.Name + " (course)");
             }
+
             Console.ReadLine();
         }
     }

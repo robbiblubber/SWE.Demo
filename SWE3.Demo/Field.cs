@@ -17,7 +17,7 @@ namespace SWE3.Demo
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // constructors                                                                                                     //
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        
+
         /// <summary>Creates a new instance of this class.</summary>
         /// <param name="entity">Parent entity.</param>
         public Field(Entity entity)
@@ -76,7 +76,7 @@ namespace SWE3.Demo
         /// <summary>Gets the field type.</summary>
         public Type FieldType
         {
-            get 
+            get
             {
                 if(FieldMember is PropertyInfo) { return ((PropertyInfo) FieldMember).PropertyType; }
 
@@ -85,10 +85,31 @@ namespace SWE3.Demo
         }
 
 
+        /// <summary>Gets the assignement table for m:n relationships.</summary>
+        public string AssignmentTable
+        {
+            get; internal set;
+        } = null;
+
+
+        /// <summary>Gets the remote column name for m:n relationships.</summary>
+        public string RemoteColumnName
+        {
+            get; internal set;
+        } = null;
+
+
         /// <summary>Gets if the field is not part of the table.</summary>
         public bool IsExternal
         {
-            get; set;
+            get; internal set;
+        }
+
+
+        /// <summary>Gets if the field is a m:n field.</summary>
+        public bool IsManyToMany
+        {
+            get { return AssignmentTable != null; }
         }
 
 
@@ -163,6 +184,13 @@ namespace SWE3.Demo
                         string sql = innerType._GetEntity().GetSQL() + " WHERE " + ColumnName + " = :fk";
                         Tuple<string, object>[] parameters = new Tuple<string, object>[] { new Tuple<string, object>(":fk", Entity.PrimaryKeys[0].ToFieldType(value)) };
                         object rval;
+
+                        if(IsManyToMany)
+                        {
+                            sql = innerType._GetEntity().GetSQL("T.") + " T WHERE EXISTS (SELECT * FROM " + AssignmentTable + " X " +
+                                                                    "WHERE X." + RemoteColumnName + " = T." + innerType._GetEntity().PrimaryKeys[0].ColumnName + " AND " +
+                                                                    "X." + ColumnName + " = :fk)";
+                        }
 
                         if(typeof(ILazy).IsAssignableFrom(FieldType))
                         {

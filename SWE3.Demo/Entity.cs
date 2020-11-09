@@ -54,6 +54,8 @@ namespace SWE3.Demo
                     if(field.IsForeignKey = (fattr is fkAttribute))
                     {
                         field.IsExternal = typeof(IEnumerable).IsAssignableFrom(i.PropertyType);
+                        field.AssignmentTable  = ((fkAttribute) fattr).AssignmentTable;
+                        field.RemoteColumnName = ((fkAttribute) fattr).RemoteColumnName;
                     }
                 }
                 else
@@ -130,14 +132,16 @@ namespace SWE3.Demo
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         
         /// <summary>Gets entity SQL.</summary>
+        /// <param name="prefix">Prefix.</param>
         /// <returns>SQL string.</returns>
-        public string GetSQL()
+        public string GetSQL(string prefix = null)
         {
+            if(prefix == null) { prefix = ""; }
             string query = "SELECT ";
             for(int i = 0; i < Internals.Length; i++)
             {
-                if(i > 0) { query += ","; }
-                query += Internals[i].ColumnName;
+                if(i > 0) { query += ", "; }
+                query += prefix.Trim() + Internals[i].ColumnName.ToUpper();
             }
             query += (" FROM " + TableName);
 
