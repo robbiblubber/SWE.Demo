@@ -24,7 +24,7 @@ namespace SWE3.Demo
             entityAttribute tattr = (entityAttribute) t.GetCustomAttribute(typeof(entityAttribute));
             if((tattr == null) || (string.IsNullOrWhiteSpace(tattr.TableName)))
             {
-                TableName = t.Name;
+                TableName = t.Name.ToUpper();
             }
             else { TableName = tattr.TableName; }
 

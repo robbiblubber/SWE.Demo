@@ -45,13 +45,13 @@ namespace SWE3.Demo
         {
             get
             {
-                if(!_Initialized) { _Value = World.GetObject<T>(_Pks); }
+                if(!_Initialized) { _Value = World.GetObject<T>(_Pks); _Initialized = true; }
                 return _Value;
             }
             set 
             {
+                _Value = value;
                 _Initialized = true;
-                _Value = value; 
             }
         }
 

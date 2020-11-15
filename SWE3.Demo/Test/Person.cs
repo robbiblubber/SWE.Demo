@@ -37,7 +37,7 @@ namespace SWE3.Demo.Test
 
 
 
-    /// <summary>This enumeration defiones genders.</summary>
+    /// <summary>This enumeration defines genders.</summary>
     public enum Gender: int
     {
         FEMALE = 0,
