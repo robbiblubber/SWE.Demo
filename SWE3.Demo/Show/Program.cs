@@ -9,8 +9,13 @@ using System.Threading.Tasks;
 
 namespace SWE3.Demo.Show
 {
+    /// <summary>This class contains the program entry point.</summary>
     class Program
     {
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // entry point                                                                                                      //
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        
         /// <summary>Main entry point.</summary>
         /// <param name="args">Arguments</param>
         static void Main(string[] args)
