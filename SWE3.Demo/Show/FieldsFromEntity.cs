@@ -26,7 +26,8 @@ namespace SWE3.Demo.Show
             foreach(Field i in ent.Fields)
             {
                 Console.Write(i.FieldMember.Name + " => " + ent.TableName + "." + i.ColumnName);
-                if(ent.PrimaryKeys.Contains(i)) { Console.Write(" (PK)"); }
+                if(i.IsPrimaryKey) { Console.Write(" (pk)"); }
+                if(i.IsForeignKey) { Console.Write(" (fk)"); }
                 Console.WriteLine();
             }
 

@@ -123,6 +123,11 @@ namespace SWE3.Demo
         /// <returns>Database type representation of the value.</returns>
         public object ToColumnType(object value)
         {
+            if(IsForeignKey)
+            {
+                return FieldType._GetEntity().PrimaryKeys[0].ToColumnType(FieldType._GetEntity().PrimaryKeys[0].GetValue(value));
+            }
+
             if(FieldType == ColumnType) { return value; }
 
             if(value is bool)
@@ -160,6 +165,7 @@ namespace SWE3.Demo
 
         /// <summary>Gets the field value.</summary>
         /// <param name="obj">Object.</param>
+        /// <returns>Field value.</returns>
         public object GetValue(object obj)
         {
             if(FieldMember is PropertyInfo) { return ((PropertyInfo) FieldMember).GetValue(obj); }
@@ -212,8 +218,7 @@ namespace SWE3.Demo
                         }
                         else
                         {
-                            ((PropertyInfo) FieldMember).SetValue(obj, World._CreateObject(FieldType._GetEntity().EntityType,
-                                                                  new object[] { FieldType._GetEntity().PrimaryKeys[0].ToFieldType(value) }, objects));
+                            ((PropertyInfo) FieldMember).SetValue(obj, World._CreateObject(FieldType, new object[] { FieldType._GetEntity().PrimaryKeys[0].ToFieldType(value) }, objects));
                         }
                     } 
                 }

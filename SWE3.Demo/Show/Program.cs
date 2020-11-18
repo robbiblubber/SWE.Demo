@@ -25,9 +25,10 @@ namespace SWE3.Demo.Show
             SQLToFrameworkObjects.Show();
             CreateObjectWithFK.Show();
             CreateObjectWithFKList.Show();
+            CreateObjectWithMToNFK.Show();
             */
 
-            CreateObjectWithMToNFK.Show();
+            InsertNewObjectAndUpdate.Show();
         }
     }
 }

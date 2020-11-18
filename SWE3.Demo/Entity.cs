@@ -131,21 +131,21 @@ namespace SWE3.Demo
         // public methods                                                                                                   //
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         
-        /// <summary>Gets entity SQL.</summary>
+        /// <summary>Gets the entity SQL.</summary>
         /// <param name="prefix">Prefix.</param>
         /// <returns>SQL string.</returns>
         public string GetSQL(string prefix = null)
         {
             if(prefix == null) { prefix = ""; }
-            string query = "SELECT ";
+            string rval = "SELECT ";
             for(int i = 0; i < Internals.Length; i++)
             {
-                if(i > 0) { query += ", "; }
-                query += prefix.Trim() + Internals[i].ColumnName.ToUpper();
+                if(i > 0) { rval += ", "; }
+                rval += prefix.Trim() + Internals[i].ColumnName;
             }
-            query += (" FROM " + TableName);
+            rval += (" FROM " + TableName);
 
-            return query;
+            return rval;
         }
     }
 }

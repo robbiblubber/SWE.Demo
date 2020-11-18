@@ -45,11 +45,12 @@ namespace SWE3.Demo
             }
             else { t = o.GetType(); }
 
-            if(_Entities.ContainsKey(t)) return _Entities[t];
+            if(!_Entities.ContainsKey(t))
+            {
+                _Entities.Add(t, new Entity(t));
+            }
 
-            Entity rval = new Entity(t);
-            _Entities.Add(t, rval);
-            return rval;
+            return _Entities[t];
         }
 
 
@@ -78,12 +79,12 @@ namespace SWE3.Demo
                 if(objects == null) { objects = new List<object>(); }
                 objects.Add(rval = Activator.CreateInstance(t));
 
-                foreach(Field i in rval._GetEntity().PrimaryKeys)
+                foreach(Field i in t._GetEntity().PrimaryKeys)
                 {
                     i.SetValue(rval, i.ToFieldType(re.GetValue(re.GetOrdinal(i.ColumnName))));
                 }
 
-                foreach(Field i in rval._GetEntity().Fields)
+                foreach(Field i in t._GetEntity().Fields)
                 {
                     if(!i.IsPrimaryKey)
                     {
@@ -101,7 +102,7 @@ namespace SWE3.Demo
         /// <summary>Creates an instance by its primary keys.</summary>
         /// <param name="t">Type.</param>
         /// <param name="pks">Primary keys.</param>
-        /// <param name="objects">Cached obejcst.</param>
+        /// <param name="objects">Cached objects.</param>
         /// <returns>Object.</returns>
         internal static object _CreateObject(Type t, IEnumerable<object> pks, ICollection<object> objects = null)
         {
@@ -123,17 +124,17 @@ namespace SWE3.Demo
             }
             cmd.CommandText = query;
 
-            object rval;
+            object rval = null;
             IDataReader re = cmd.ExecuteReader();
             if(re.Read())
             {
                 rval = _CreateObject(t, re, objects);
             }
-            else { throw new Exception("No data."); }
 
             re.Close();
             cmd.Dispose();
 
+            if(rval == null) { throw new Exception("No data."); }
             return rval;
         }
 
@@ -190,7 +191,7 @@ namespace SWE3.Demo
         }
 
 
-        /// <summary>Searches the cached objects for an object and returns it..</summary>
+        /// <summary>Searches the cached objects for an object and returns it.</summary>
         /// <param name="t">Type.</param>
         /// <param name="re">Reader.</param>
         /// <param name="objects">Cached objects.</param>
@@ -245,6 +246,80 @@ namespace SWE3.Demo
         public static T GetObject<T>(params object[] pks)
         {
             return (T) _CreateObject(typeof(T), pks);
+        }
+
+
+        /// <summary>Saves an object.</summary>
+        /// <param name="obj">Object.</param>
+        public static void Save(object obj)
+        {
+            Entity ent = obj._GetEntity();
+
+            IDbCommand cmd = Connection.CreateCommand();
+            cmd.CommandText = ("INSERT INTO " + ent.TableName + " (");
+
+            string update = "ON CONFLICT (";
+            string insert = "";
+            for(int i = 0; i < ent.PrimaryKeys.Length; i++)
+            {
+                if(i > 0) { update += ", "; }
+                update += ent.PrimaryKeys[i].ColumnName;
+            }
+            update += ") DO UPDATE SET ";
+
+            IDataParameter p;
+            bool first = true;
+            for(int i = 0; i < ent.Internals.Length; i++)
+            {
+                if(i > 0) { cmd.CommandText += ", "; insert += ", "; }
+                cmd.CommandText += ent.Internals[i].ColumnName;
+
+                insert += (":" + ent.Internals[i].ColumnName.ToLower() + "v");
+                
+                p = cmd.CreateParameter();
+                p.ParameterName = (":" + ent.Internals[i].ColumnName.ToLower() + "v");
+                p.Value = ent.Internals[i].ToColumnType(ent.Internals[i].GetValue(obj));
+                cmd.Parameters.Add(p);
+
+                if(!ent.Internals[i].IsPrimaryKey)
+                {
+                    if(first) { first = false; } else { update += ", "; }
+                    update += (ent.Internals[i].ColumnName + " = " + (":" + ent.Internals[i].ColumnName.ToLower() + "w"));
+
+                    p = cmd.CreateParameter();
+                    p.ParameterName = (":" + ent.Internals[i].ColumnName.ToLower() + "w");
+                    p.Value = ent.Internals[i].ToColumnType(ent.Internals[i].GetValue(obj));
+                    cmd.Parameters.Add(p);
+                }
+            }
+            cmd.CommandText += ") VALUES (" + insert + ") " + update;
+
+            cmd.ExecuteNonQuery();
+        }
+
+
+        /// <summary>Deletes an object.</summary>
+        /// <param name="obj">Object.</param>
+        public static void Delete(object obj)
+        {
+            Entity ent = obj._GetEntity();
+
+            IDbCommand cmd = Connection.CreateCommand();
+            cmd.CommandText = ("DELETE FROM " + ent.TableName + " WHERE ");
+            IDataParameter p;
+
+            for(int i = 0; i < ent.PrimaryKeys.Length; i++)
+            {
+                if(i > 0) { cmd.CommandText += " AND "; }
+                cmd.CommandText += (ent.PrimaryKeys[i].ColumnName + " = " + (":" + ent.PrimaryKeys[i].ColumnName.ToLower() + "v"));
+
+                p = cmd.CreateParameter();
+                p.ParameterName = (":" + ent.PrimaryKeys[i].ColumnName.ToLower() + "v");
+                p.Value = ent.PrimaryKeys[i].ToColumnType(ent.PrimaryKeys[i].GetValue(obj));
+                cmd.Parameters.Add(p);
+            }
+
+            cmd.ExecuteNonQuery();
         }
     }
 }
