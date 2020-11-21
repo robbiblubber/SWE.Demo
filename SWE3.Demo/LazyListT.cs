@@ -17,14 +17,8 @@ namespace SWE3.Demo
         // protected members                                                                                                //
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        /// <summary>Primary keys.</summary>
-        protected object[] _Pks;
-
         /// <summary>List values.</summary>
         protected List<T> _InternalItems = null;
-
-        /// <summary>Table implementing a many to many relationship.</summary>
-        protected string _Table = null;
 
         /// <summary>SQL.</summary>
         protected string _Sql;

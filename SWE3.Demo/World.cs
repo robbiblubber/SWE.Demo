@@ -292,7 +292,7 @@ namespace SWE3.Demo
                     cmd.Parameters.Add(p);
                 }
             }
-            cmd.CommandText += ") VALUES (" + insert + ") " + update;
+            cmd.CommandText += (") VALUES (" + insert + ") " + update);
 
             cmd.ExecuteNonQuery();
         }

@@ -16,11 +16,6 @@ namespace SWE3.Demo.Test
         public string ID { get; set; }
 
 
-        /// <summary>Gets or sets the active flag.</summary>
-        [field(ColumnName = "HACTIVE", ColumnType = typeof(int))]
-        public bool Active { get; set; }
-
-
         /// <summary>Gets or sets the course name.</summary>
         public string Name { get; set; }
 

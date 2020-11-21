@@ -22,7 +22,7 @@ namespace SWE3.Demo.Show
 
             Teacher t = World.GetObject<Teacher>("T0");
 
-            Console.WriteLine(t.ID + " => " + t.Name);
+            Console.WriteLine(t.ID + ": [" + t.Name + "]");
             foreach(Class i in t.Classes)                                       // with eager loading
             {
                 Console.WriteLine("   " + i.Name + " (class)");

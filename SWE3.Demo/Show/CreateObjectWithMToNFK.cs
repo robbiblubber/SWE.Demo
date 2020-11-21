@@ -11,7 +11,7 @@ using SWE3.Demo.Test;
 
 namespace SWE3.Demo.Show
 {
-    /// <summary>This class shows how to create a single instance with an ID.</summary>
+    /// <summary>This class shows how to create an instance with lists from m:n foreign keys.</summary>
     public class CreateObjectWithMToNFK
     {
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -26,7 +26,7 @@ namespace SWE3.Demo.Show
 
             Course c = World.GetObject<Course>("X0");
 
-            Console.WriteLine(c.ID + " => " + c.Name);
+            Console.WriteLine(c.ID + ": [" + c.Name + "]");
             foreach(Student i in c.Students)                                    // eager loading
             {
                 Console.WriteLine("   " + i.Name + " (student)");
@@ -35,7 +35,7 @@ namespace SWE3.Demo.Show
             Console.WriteLine();
             Student s = World.GetObject<Student>("Z2");
 
-            Console.WriteLine(s.ID + " => " + s.Name);
+            Console.WriteLine(s.ID + ": [" + s.Name + "]");
             foreach(Course i in s.Courses)                                     // lazy loading
             {
                 Console.WriteLine("   " + i.Name + " (course)");
