@@ -73,6 +73,13 @@ namespace SWE3.Demo
         } = false;
 
 
+        /// <summary>Gets if the column is nullable.</summary>
+        public bool IsNullable
+        {
+            get; internal set;
+        } = false;
+
+
         /// <summary>Gets the field type.</summary>
         public Type FieldType
         {
@@ -218,7 +225,8 @@ namespace SWE3.Demo
                         }
                         else
                         {
-                            ((PropertyInfo) FieldMember).SetValue(obj, World._CreateObject(FieldType, new object[] { FieldType._GetEntity().PrimaryKeys[0].ToFieldType(value) }, objects));
+                            if(value.GetType() != FieldType) { value = World._CreateObject(FieldType, new object[] { FieldType._GetEntity().PrimaryKeys[0].ToFieldType(value) }, objects); }
+                            ((PropertyInfo) FieldMember).SetValue(obj, value);
                         }
                     } 
                 }
@@ -228,6 +236,90 @@ namespace SWE3.Demo
             }
 
             throw new NotSupportedException("Member type not supported.");
+        }
+
+
+        /// <summary>Saves the references.</summary>
+        /// <param name="obj">Object.</param>
+        public void SaveReferences(object obj)
+        {
+            if(!IsExternal) return;
+
+            Type innerType = FieldType.GetGenericArguments()[0];
+            Entity innerEntity = innerType._GetEntity();
+            object myPk = Entity.PrimaryKeys[0].ToColumnType(Entity.PrimaryKeys[0].GetValue(obj));
+
+            if(IsManyToMany)
+            {
+                IDbCommand cmd = World.Connection.CreateCommand();
+                cmd.CommandText = ("DELETE FROM " + AssignmentTable + " WHERE " + ColumnName + " = :pk");
+                IDataParameter p = cmd.CreateParameter();
+                p.ParameterName = ":pk";
+                p.Value = myPk;
+                cmd.Parameters.Add(p);
+
+                cmd.ExecuteNonQuery();
+                cmd.Dispose();
+
+                foreach(object i in (IEnumerable) GetValue(obj))
+                {
+                    cmd = World.Connection.CreateCommand();
+                    cmd.CommandText = ("INSERT INTO " + AssignmentTable + "(" + ColumnName + ", " + RemoteColumnName + ") VALUES (:pk, :fk)");
+                    p = cmd.CreateParameter();
+                    p.ParameterName = ":pk";
+                    p.Value = myPk;
+                    cmd.Parameters.Add(p);
+
+                    p = cmd.CreateParameter();
+                    p.ParameterName = ":fk";
+                    p.Value = innerEntity.PrimaryKeys[0].ToColumnType(innerEntity.PrimaryKeys[0].GetValue(i));
+                    cmd.Parameters.Add(p);
+
+                    cmd.ExecuteNonQuery();
+                    cmd.Dispose();
+                }
+            }
+            else
+            {
+                Field remoteField = innerEntity.GetFieldForColumn(ColumnName);
+
+                if(remoteField.IsNullable)
+                {
+                    try
+                    {
+                        IDbCommand cmd = World.Connection.CreateCommand();
+                        cmd.CommandText = ("UPDATE " + innerType._GetEntity().TableName + " SET " + ColumnName + " = NULL WHERE " + ColumnName + " = :fk");
+                        IDataParameter p = cmd.CreateParameter();
+                        p.ParameterName = ":fk";
+                        p.Value = myPk;
+                        cmd.Parameters.Add(p);
+
+                        cmd.ExecuteNonQuery();
+                        cmd.Dispose();
+                    }
+                    catch(Exception) {}
+                }
+
+                foreach(object i in (IEnumerable) GetValue(obj))
+                {
+                    remoteField.SetValue(i, obj);
+
+                    IDbCommand cmd = World.Connection.CreateCommand();
+                    cmd.CommandText = ("UPDATE " + innerType._GetEntity().TableName + " SET " + ColumnName + " = :fk WHERE " + innerType._GetEntity().PrimaryKeys[0].ColumnName + " = :pk");
+                    IDataParameter p = cmd.CreateParameter();
+                    p.ParameterName = ":fk";
+                    p.Value = myPk;
+                    cmd.Parameters.Add(p);
+
+                    p = cmd.CreateParameter();
+                    p.ParameterName = ":pk";
+                    p.Value = innerEntity.PrimaryKeys[0].ToColumnType(innerEntity.PrimaryKeys[0].GetValue(i));
+                    cmd.Parameters.Add(p);
+
+                    cmd.ExecuteNonQuery();
+                    cmd.Dispose();
+                }
+            }
         }
     }
 }

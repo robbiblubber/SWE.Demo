@@ -26,9 +26,10 @@ namespace SWE3.Demo.Show
             CreateObjectWithFK.Show();
             CreateObjectWithFKList.Show();
             CreateObjectWithMToNFK.Show();
+            InsertNewObjectAndUpdate.Show();
             */
 
-            InsertNewObjectAndUpdate.Show();
+            SaveObjectsWithLists.Show();
         }
     }
 }

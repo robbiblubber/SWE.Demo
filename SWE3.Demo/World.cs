@@ -215,6 +215,7 @@ namespace SWE3.Demo
         }
 
 
+
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // public static methods                                                                                            //
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -295,6 +296,9 @@ namespace SWE3.Demo
             cmd.CommandText += (") VALUES (" + insert + ") " + update);
 
             cmd.ExecuteNonQuery();
+            cmd.Dispose();
+
+            foreach(Field i in ent.Externals) { i.SaveReferences(obj); }
         }
 
 
@@ -320,6 +324,7 @@ namespace SWE3.Demo
             }
 
             cmd.ExecuteNonQuery();
+            cmd.Dispose();
         }
     }
 }

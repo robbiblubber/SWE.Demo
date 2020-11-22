@@ -50,7 +50,9 @@ namespace SWE3.Demo
 
                     field.ColumnName = (fattr?.ColumnName ?? i.Name);
                     field.ColumnType = (fattr?.ColumnType ?? i.PropertyType);
-                    
+
+                    field.IsNullable = (fattr.Nullable);
+
                     if(field.IsForeignKey = (fattr is fkAttribute))
                     {
                         field.IsExternal = typeof(IEnumerable).IsAssignableFrom(i.PropertyType);
@@ -146,6 +148,21 @@ namespace SWE3.Demo
             rval += (" FROM " + TableName);
 
             return rval;
+        }
+
+
+        /// <summary>Gets a field by its column name.</summary>
+        /// <param name="columnName">Column name.</param>
+        /// <returns>Field.</returns>
+        public Field GetFieldForColumn(string columnName)
+        {
+            columnName = columnName.ToUpper();
+            foreach(Field i in Internals)
+            {
+                if(i.ColumnName.ToUpper() == columnName) { return i; }
+            }
+
+            return null;
         }
     }
 }

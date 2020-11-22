@@ -65,6 +65,7 @@
     <Compile Include="Show\Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Show\FieldsFromEntity.cs" />
+    <Compile Include="Show\SaveObjectsWithLists.cs" />
     <Compile Include="Show\SQLToFrameworkObjects.cs" />
     <Compile Include="Test\Class.cs" />
     <Compile Include="Test\Course.cs" />
