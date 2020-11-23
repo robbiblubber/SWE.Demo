@@ -27,7 +27,7 @@ namespace SWE3.Demo.Show
 
             c.Teacher = World.GetObject<Teacher>("T2");
             
-            c.Students.Add(World.GetObject<Student>("Z0"));                     // 1:n
+            c.Students.Add(World.GetObject<Student>("Z0"));                     // m:n
             c.Students.Add(World.GetObject<Student>("Z1"));
             World.Save(c);
 

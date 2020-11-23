@@ -288,7 +288,7 @@ namespace SWE3.Demo
                     try
                     {
                         IDbCommand cmd = World.Connection.CreateCommand();
-                        cmd.CommandText = ("UPDATE " + innerType._GetEntity().TableName + " SET " + ColumnName + " = NULL WHERE " + ColumnName + " = :fk");
+                        cmd.CommandText = ("UPDATE " + innerEntity.TableName + " SET " + ColumnName + " = NULL WHERE " + ColumnName + " = :fk");
                         IDataParameter p = cmd.CreateParameter();
                         p.ParameterName = ":fk";
                         p.Value = myPk;
@@ -305,7 +305,7 @@ namespace SWE3.Demo
                     remoteField.SetValue(i, obj);
 
                     IDbCommand cmd = World.Connection.CreateCommand();
-                    cmd.CommandText = ("UPDATE " + innerType._GetEntity().TableName + " SET " + ColumnName + " = :fk WHERE " + innerType._GetEntity().PrimaryKeys[0].ColumnName + " = :pk");
+                    cmd.CommandText = ("UPDATE " + innerType._GetEntity().TableName + " SET " + ColumnName + " = :fk WHERE " + innerEntity.PrimaryKeys[0].ColumnName + " = :pk");
                     IDataParameter p = cmd.CreateParameter();
                     p.ParameterName = ":fk";
                     p.Value = myPk;
