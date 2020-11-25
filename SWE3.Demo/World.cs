@@ -19,7 +19,7 @@ namespace SWE3.Demo
         private static Dictionary<Type, Entity> _Entities = new Dictionary<Type, Entity>();
 
         /// <summary>Caches.</summary>
-        private static Dictionary<Type, Cache> _Caches = new Dictionary<Type, Demo.Cache>();
+        private static Dictionary<Type, Cache> _Caches = new Dictionary<Type, Cache>();
 
         /// <summary>Empty cache.</summary>
         private static readonly Cache _NullCache = new NullCache();
