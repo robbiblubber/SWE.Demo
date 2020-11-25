@@ -50,6 +50,7 @@
   <ItemGroup>
     <Compile Include="Attributes\fkAttribute.cs" />
     <Compile Include="Attributes\ignoreAttribute.cs" />
+    <Compile Include="Cache.cs" />
     <Compile Include="Entity.cs" />
     <Compile Include="Field.cs" />
     <Compile Include="Attributes\fieldAttribute.cs" />
@@ -58,6 +59,7 @@
     <Compile Include="ILazy.cs" />
     <Compile Include="LazyListT.cs" />
     <Compile Include="LazyT.cs" />
+    <Compile Include="NullCache.cs" />
     <Compile Include="Show\CreateObjectWithFKList.cs" />
     <Compile Include="Show\CreateObjectWithFK.cs" />
     <Compile Include="Show\CreateObjectWithMToNFK.cs" />
@@ -67,6 +69,7 @@
     <Compile Include="Show\FieldsFromEntity.cs" />
     <Compile Include="Show\SaveObjectsWithLists.cs" />
     <Compile Include="Show\SQLToFrameworkObjects.cs" />
+    <Compile Include="Show\UseCaching.cs" />
     <Compile Include="Test\Class.cs" />
     <Compile Include="Test\Course.cs" />
     <Compile Include="Test\Person.cs" />

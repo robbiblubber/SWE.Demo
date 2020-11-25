@@ -3,8 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
+
 
 namespace SWE3.Demo
 {
@@ -18,6 +18,12 @@ namespace SWE3.Demo
         /// <summary>Entities.</summary>
         private static Dictionary<Type, Entity> _Entities = new Dictionary<Type, Entity>();
 
+        /// <summary>Caches.</summary>
+        private static Dictionary<Type, Cache> _Caches = new Dictionary<Type, Demo.Cache>();
+
+        /// <summary>Empty cache.</summary>
+        private static readonly Cache _NullCache = new NullCache();
+
 
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -28,10 +34,30 @@ namespace SWE3.Demo
         public static IDbConnection Connection { get; set; }
 
 
+        /// <summary>Gets or sets if caching is enabled.</summary>
+        public static bool CachingEnabled { get; set; } = true;
+
+
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // private static methods                                                                                           //
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        /// <summary>Gets the cache for a type.</summary>
+        /// <param name="t">Type.</param>
+        /// <returns>Cache.</returns>
+        private static Cache _GetCache(Type t)
+        {
+            if(!CachingEnabled) { return _NullCache; }
+
+            if(!_Caches.ContainsKey(t))
+            {
+                _Caches.Add(t, new Cache());
+            }
+
+            return _Caches[t];
+        }
+
 
         /// <summary>Gets an entity descriptor for an object.</summary>
         /// <param name="o">Object.</param>
@@ -92,7 +118,7 @@ namespace SWE3.Demo
                     }
                 }
 
-                
+                _GetCache(t)[t._GetEntity().PrimaryKeys[0].GetValue(rval)] = rval;
             }
 
             return rval;
@@ -198,20 +224,23 @@ namespace SWE3.Demo
         /// <returns>Returns the cached object that matches the current reader or NULL if no such object has been found.</returns>
         private static object _GetCachedObject(Type t, IDataReader re, ICollection<object> objects)
         {
-            if(objects == null) { return null; }
-            foreach(object i in objects)
+            if(objects != null)
             {
-                if(i.GetType() != t) continue;
-
-                bool found = true;
-                foreach(Field k in t._GetEntity().PrimaryKeys)
+                foreach(object i in objects)
                 {
-                    if(!k.GetValue(i).Equals(k.ToFieldType(re.GetValue(re.GetOrdinal(k.ColumnName))))) { found = false; break; }
+                    if(i.GetType() != t) continue;
+
+                    bool found = true;
+                    foreach(Field k in t._GetEntity().PrimaryKeys)
+                    {
+                        if(!k.GetValue(i).Equals(k.ToFieldType(re.GetValue(re.GetOrdinal(k.ColumnName))))) { found = false; break; }
+                    }
+                    if(found) { return i; }
                 }
-                if(found) { return i; }
             }
 
-            return null;
+            Field pk = t._GetEntity().PrimaryKeys[0];
+            return _GetCache(t)[pk.ToFieldType(re.GetValue(re.GetOrdinal(pk.ColumnName)))]; ;
         }
 
 
@@ -219,6 +248,14 @@ namespace SWE3.Demo
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // public static methods                                                                                            //
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        /// <summary>Clears the cache.</summary>
+        public static void ClearCache()
+        {
+            _Caches = new Dictionary<Type, Cache>();
+        }
+
+
 
         /// <summary>Returns an array of instances for an SQL query.</summary>
         /// <typeparam name="T">Type.</typeparam>
@@ -299,6 +336,8 @@ namespace SWE3.Demo
             cmd.Dispose();
 
             foreach(Field i in ent.Externals) { i.SaveReferences(obj); }
+
+            _GetCache(obj.GetType())[ent.PrimaryKeys[0].GetValue(obj)] = obj;
         }
 
 
@@ -325,6 +364,8 @@ namespace SWE3.Demo
 
             cmd.ExecuteNonQuery();
             cmd.Dispose();
+
+            _GetCache(obj.GetType()).Delete(ent.PrimaryKeys[0].GetValue(obj));
         }
     }
 }

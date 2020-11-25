@@ -10,9 +10,18 @@ namespace SWE3.Demo.Test
     public abstract class Person
     {
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // protected static members                                                                                         //
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        /// <summary>Instance number counter.</summary>
+        protected static int _N = 1;
+
+
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // public properties                                                                                                //
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        
+
         /// <summary>Gets or sets the person ID.</summary>
         [pk]
         public string ID { get; set; }
@@ -33,6 +42,11 @@ namespace SWE3.Demo.Test
 
         /// <summary>Gets or sets the person gender.</summary>
         public Gender Gender { get; set; }
+
+
+        /// <summary>Gets the instance number.</summary>
+        [ignore]
+        public int InstanceNumber { get; protected set; } = _N++;
     }
 
 
