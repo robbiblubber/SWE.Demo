@@ -38,6 +38,10 @@ namespace SWE3.Demo
         public static bool CachingEnabled { get; set; } = true;
 
 
+        /// <summary>Gets this world's owner key.</summary>
+        public static string OwnerKey { get; } = new Random().Next(100000, 999999).ToString();
+
+
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // private static methods                                                                                           //
@@ -366,6 +370,105 @@ namespace SWE3.Demo
             cmd.Dispose();
 
             _GetCache(obj.GetType()).Delete(ent.PrimaryKeys[0].GetValue(obj));
+        }
+
+
+        /// <summary>Locks an object.</summary>
+        /// <param name="obj">Object.</param>
+        /// <exception cref="ObjectLockedException">Thrown when the object is locked.</exception>
+        public static void Lock(object obj)
+        {
+            IDbCommand cmd = Connection.CreateCommand();
+            cmd.CommandText = "INSERT INTO LOCKS (OWNER_KEY, TYPE_KEY, OBJECT_ID) VALUES (:own, :typ, :obj)";
+
+            IDataParameter p = cmd.CreateParameter();
+            p.ParameterName = ":own";
+            p.Value = OwnerKey;
+            cmd.Parameters.Add(p);
+
+            p = cmd.CreateParameter();
+            p.ParameterName = ":typ";
+            p.Value = obj.GetType().FullName;
+            cmd.Parameters.Add(p);
+
+            p = cmd.CreateParameter();
+            p.ParameterName = ":obj";
+            p.Value = obj._GetEntity().PrimaryKeys[0].GetValue(obj).ToString();
+            cmd.Parameters.Add(p);
+
+            bool success = true;
+            try
+            {
+                cmd.ExecuteNonQuery();
+            }
+            catch(Exception) { success = false; }
+            cmd.Dispose();
+
+            if(success) return;
+
+            string owner = IsLockedBy(obj);
+            if(owner != OwnerKey) { throw new ObjectLockedException(owner); }
+        }
+
+
+        /// <summary>Returns the owner key that locks an object.</summary>
+        /// <param name="obj">Object.</param>
+        /// <returns>Returns TRUE if the object is locked (by another owner), otherwise returns NULL.</returns>
+        public static string IsLockedBy(object obj)
+        {
+            IDbCommand cmd = Connection.CreateCommand();
+            cmd.CommandText = "SELECT OWNER_KEY FROM LOCKS WHERE TYPE_KEY = :typ AND OBJECT_ID = :obj";
+
+            IDataParameter p = cmd.CreateParameter();
+            p.ParameterName = ":typ";
+            p.Value = obj.GetType().FullName;
+            cmd.Parameters.Add(p);
+
+            p = cmd.CreateParameter();
+            p.ParameterName = ":obj";
+            p.Value = obj._GetEntity().PrimaryKeys[0].GetValue(obj).ToString();
+            cmd.Parameters.Add(p);
+
+            string owner = (string) cmd.ExecuteScalar();
+            cmd.Dispose();
+
+            return owner;
+        }
+
+
+        /// <summary>Returns the if an object is locked.</summary>
+        /// <param name="obj">Object.</param>
+        /// <returns>Returns TRUE if the object is locked (by another owner), otherwise returns NULL.</returns>
+        public static bool IsLocked(object obj)
+        {
+            return (IsLockedBy(obj) != OwnerKey);
+        }
+
+
+        /// <summary>Releases a lock on an object.</summary>
+        /// <param name="obj">Object.</param>
+        public static void ReleaseLock(object obj)
+        {
+            IDbCommand cmd = Connection.CreateCommand();
+            cmd.CommandText = "DELETE FROM LOCKS WHERE OWNER_KEY = :own AND TYPE_KEY = :typ AND OBJECT_ID = :obj";
+
+            IDataParameter p = cmd.CreateParameter();
+            p.ParameterName = ":own";
+            p.Value = OwnerKey;
+            cmd.Parameters.Add(p);
+
+            p = cmd.CreateParameter();
+            p.ParameterName = ":typ";
+            p.Value = obj.GetType().FullName;
+            cmd.Parameters.Add(p);
+
+            p = cmd.CreateParameter();
+            p.ParameterName = ":obj";
+            p.Value = obj._GetEntity().PrimaryKeys[0].GetValue(obj).ToString();
+            cmd.Parameters.Add(p);
+
+            cmd.ExecuteNonQuery();
+            cmd.Dispose();
         }
     }
 }

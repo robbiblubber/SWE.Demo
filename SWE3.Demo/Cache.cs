@@ -49,7 +49,7 @@ namespace SWE3.Demo
             }
             set
             {
-                if(_Cache.ContainsKey(pk)) { _Cache[pk] = value; }
+                if(_Cache.ContainsKey(pk)) { _Cache[pk] = value; return; }
                 _Cache.Add(pk, value);
             }
         }
