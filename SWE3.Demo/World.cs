@@ -388,7 +388,7 @@ namespace SWE3.Demo
 
             p = cmd.CreateParameter();
             p.ParameterName = ":typ";
-            p.Value = obj.GetType().FullName;
+            p.Value = obj._GetEntity().TableName;
             cmd.Parameters.Add(p);
 
             p = cmd.CreateParameter();
@@ -404,10 +404,11 @@ namespace SWE3.Demo
             catch(Exception) { success = false; }
             cmd.Dispose();
 
-            if(success) return;
-
-            string owner = IsLockedBy(obj);
-            if(owner != OwnerKey) { throw new ObjectLockedException(owner); }
+            if(!success)
+            {
+                string owner = IsLockedBy(obj);
+                if(owner != OwnerKey) { throw new ObjectLockedException(owner); }
+            }
         }
 
 
@@ -421,7 +422,7 @@ namespace SWE3.Demo
 
             IDataParameter p = cmd.CreateParameter();
             p.ParameterName = ":typ";
-            p.Value = obj.GetType().FullName;
+            p.Value = obj._GetEntity().TableName;
             cmd.Parameters.Add(p);
 
             p = cmd.CreateParameter();
@@ -429,10 +430,10 @@ namespace SWE3.Demo
             p.Value = obj._GetEntity().PrimaryKeys[0].GetValue(obj).ToString();
             cmd.Parameters.Add(p);
 
-            string owner = (string) cmd.ExecuteScalar();
+            string rval = (string) cmd.ExecuteScalar();
             cmd.Dispose();
 
-            return owner;
+            return rval;
         }
 
 
