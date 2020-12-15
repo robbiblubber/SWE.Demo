@@ -3,8 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-
-
+using System.Security.Cryptography;
+using System.Text;
 
 namespace SWE3.Demo
 {
@@ -108,23 +108,23 @@ namespace SWE3.Demo
             {
                 if(objects == null) { objects = new List<object>(); }
                 objects.Add(rval = Activator.CreateInstance(t));
+            }
+            else if(HasChanged(rval)) { return rval; }
 
-                foreach(Field i in t._GetEntity().PrimaryKeys)
-                {
-                    i.SetValue(rval, i.ToFieldType(re.GetValue(re.GetOrdinal(i.ColumnName))));
-                }
-
-                foreach(Field i in t._GetEntity().Fields)
-                {
-                    if(!i.IsPrimaryKey)
-                    {
-                        i.SetValue(rval, i.ToFieldType(re.GetValue(re.GetOrdinal(i.IsExternal ? i.Entity.PrimaryKeys[0].ColumnName : i.ColumnName))), objects);
-                    }
-                }
-
-                _GetCache(t)[t._GetEntity().PrimaryKeys[0].GetValue(rval)] = rval;
+            foreach(Field i in t._GetEntity().PrimaryKeys)
+            {
+                i.SetValue(rval, i.ToFieldType(re.GetValue(re.GetOrdinal(i.ColumnName))));
             }
 
+            foreach(Field i in t._GetEntity().Fields)
+            {
+                if(!i.IsPrimaryKey)
+                {
+                    i.SetValue(rval, i.ToFieldType(re.GetValue(re.GetOrdinal(i.IsExternal ? i.Entity.PrimaryKeys[0].ColumnName : i.ColumnName))), objects);
+                }
+            }
+
+            _GetCache(t)[t._GetEntity().PrimaryKeys[0].GetValue(rval)] = rval;
             return rval;
         }
 
@@ -295,6 +295,8 @@ namespace SWE3.Demo
         /// <param name="obj">Object.</param>
         public static void Save(object obj)
         {
+            if(!HasChanged(obj)) return;
+
             Entity ent = obj._GetEntity();
 
             IDbCommand cmd = Connection.CreateCommand();
@@ -470,6 +472,33 @@ namespace SWE3.Demo
 
             cmd.ExecuteNonQuery();
             cmd.Dispose();
+        }
+
+
+        /// <summary>Gets a hash for this object.</summary>
+        /// <param name="obj">Object.</param>
+        /// <returns>Hash.</returns>
+        public static string GetHash(object obj)
+        {
+            string rval = "";
+            foreach(Field i in obj._GetEntity().Internals) { rval += (i.ColumnName + "=" + i.GetValue(obj).ToString() + ";"); }
+
+            return Encoding.UTF8.GetString(SHA256.Create().ComputeHash(Encoding.UTF8.GetBytes(rval)));
+        }
+
+
+
+        /// <summary>Gets if an object has changed.</summary>
+        /// <param name="obj">Object.</param>
+        /// <returns>Returns TRUE if the object has changes, otherwise returns FALSE.</returns>
+        public static bool HasChanged(object obj)
+        {
+            if(!CachingEnabled) return true;
+
+            string ch = _GetCache(obj.GetType()).GetHash(obj._GetEntity().PrimaryKeys[0].GetValue(obj));
+            string lh = GetHash(obj);
+
+            return (_GetCache(obj.GetType()).GetHash(obj._GetEntity().PrimaryKeys[0].GetValue(obj)) != GetHash(obj));
         }
     }
 }

@@ -18,6 +18,8 @@ namespace SWE3.Demo
         /// <summary>Actual cache.</summary>
         protected Dictionary<object, object> _Cache;
 
+        /// <summary>Hash cache.</summary>
+        protected Dictionary<object, string> _Hashes;
 
 
 
@@ -29,6 +31,7 @@ namespace SWE3.Demo
         internal protected Cache()
         {
             _Cache = new Dictionary<object, object>();
+            _Hashes = new Dictionary<object, string>();
         }
 
 
@@ -49,8 +52,16 @@ namespace SWE3.Demo
             }
             set
             {
-                if(_Cache.ContainsKey(pk)) { _Cache[pk] = value; return; }
-                _Cache.Add(pk, value);
+                if(_Cache.ContainsKey(pk))
+                {
+                    _Cache[pk] = value;
+                    _Hashes[pk] = World.GetHash(value);
+                }
+                else 
+                { 
+                    _Cache.Add(pk, value);
+                    _Hashes.Add(pk, World.GetHash(value));
+                }
             }
         }
 
@@ -74,6 +85,15 @@ namespace SWE3.Demo
         public virtual void Delete(object pk)
         {
             if(_Cache.ContainsKey(pk)) { _Cache.Remove(pk); }
+        }
+
+
+        /// <summary>Gets the hash for an object.</summary>
+        /// <param name="pk">Primary key.</param>
+        /// <returns>Hash.</returns>
+        public virtual string GetHash(object pk)
+        {
+            return _Hashes[pk];
         }
     }
 }

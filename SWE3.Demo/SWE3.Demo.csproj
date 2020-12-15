@@ -61,6 +61,7 @@
     <Compile Include="LazyT.cs" />
     <Compile Include="NullCache.cs" />
     <Compile Include="ObjectLockedException.cs" />
+    <Compile Include="Show\ChangeTracking.cs" />
     <Compile Include="Show\CreateObjectWithFKList.cs" />
     <Compile Include="Show\CreateObjectWithFK.cs" />
     <Compile Include="Show\CreateObjectWithMToNFK.cs" />

@@ -29,9 +29,10 @@ namespace SWE3.Demo.Show
             InsertNewObjectAndUpdate.Show();
             SaveObjectsWithLists.Show();
             UseCaching.Show();
+            ObjectLocking.Show();
             */
 
-            ObjectLocking.Show();
+            ChangeTracking.Show();
         }
     }
 }
